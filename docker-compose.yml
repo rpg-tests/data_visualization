@@ -1,0 +1,40 @@
+services:
+  web:
+    build: .
+    volumes:
+      - .:/data-visualization-service
+    ports:
+      - 8082:8082
+    command: ./runserver.sh
+    environment:
+      - DJANGO_SETTINGS_MODULE=core.settings.local
+      - DB_HOST=postgres
+      - DB_NAME=data_visualization
+      - DB_USER=data_visualization
+      - DB_PASSWORD=password
+      - DB_PORT=5433
+    links:
+      - postgres:postgres
+    depends_on:
+      - postgres
+    networks:
+      - rpg-net
+
+  postgres:
+    image: postgres
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    restart: always
+    environment:
+      - PGPORT=5433
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=data_visualization
+      - POSTGRES_USER=data_visualization
+      - POSTGRES_PASSWORD=password
+    networks:
+      - rpg-net
+
+networks:
+  rpg-net:
+    name: rpg-net
+    external: true
